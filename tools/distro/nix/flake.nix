@@ -52,13 +52,13 @@
           }
         )
         supportedGames;
-      mergedGames = lib.foldlAttrs (acc: _: value: acc // value) { } gamePackages;
-      allGames = pkgs.symlinkJoin {
+      flattenedGamePkgs = lib.foldlAttrs (acc: _: value: acc // value) { } gamePackages;
+      combinedGamePkg = pkgs.symlinkJoin {
         name = "simshm-all";
-        paths = lib.attrValues (lib.getAttrs (builtins.attrNames supportedGames) mergedGames);
+        paths = lib.attrValues (lib.getAttrs (builtins.attrNames supportedGames) flattenedGamePkgs);
       };
     in
     {
-      packages.${system} = mergedGames // { all = allGames; };
+      packages.${system} = flattenedGamePkgs // { default = combinedGamePkg; };
     };
 }
